@@ -20,14 +20,14 @@ class UserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password2'])
+        user.set_password(self.cleaned_data['password1'])
         if commit:
             user.save()
-            return user
+        return user
 
 
 class UserChangeForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField(help_text="you cant change password!<a href=\'../password/\'> Use this form </a>.")
+    password = ReadOnlyPasswordHashField(help_text="you can change password<a href=\'../password/\'> Using this form </a>.")
 
     class Meta:
         model = User
