@@ -4,7 +4,7 @@ from .forms import UserRegistrationForm, VerifyCodeForm
 from django.contrib import messages
 import random
 from utils import send_top_code
-from.models import OtpCode
+from.models import OtpCode, User
 
 
 # Create your views here.
@@ -33,12 +33,29 @@ class UserRegisterView(View):
 
 
 class UserRegisterVerifyCodeView(View):
-    form = VerifyCodeForm
+    form_class = VerifyCodeForm
 
     def get(self, request):
-        pass
+        form = self.form_class
+        return render(request, 'accounts/verify.html', {'form': form})
 
     def post(self, request):
+        user_session = request.session['user_registration_info']
+        code_instance = OtpCode.objects.get(phone_number=user_session['phone_number'])
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            if cd['code'] == code_instance.code:
+                User.objects.create_user(user_session['phone_number'], user_session['email'], user_session['full_name'],
+                                         user_session['password'])
+                code_instance.delete()
+                messages.success(request, 'You registered successfully', 'success')
+                return redirect('home:home')
+            else:
+                messages.error(request, 'This code is invalid', 'danger')
+                return redirect('accounts:verify_code')
+        return redirect('home:home')
+
         pass
 
 
