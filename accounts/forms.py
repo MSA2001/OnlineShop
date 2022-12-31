@@ -18,6 +18,20 @@ class UserCreationForm(forms.ModelForm):
             raise ValidationError('passwords are not match')
         return cd['password2']
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        user = User.objects.filter(email=email).exists()
+        if user:
+            raise ValidationError('This email is already exist.')
+        return email
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data['phone_number']
+        user = User.objects.filter(phone_number=phone_number).exists()
+        if user:
+            raise ValidationError('This phone number is already exist')
+        return phone_number
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
@@ -39,6 +53,20 @@ class UserRegistrationForm(forms.Form):
     full_name = forms.CharField(label='Full name')
     phone = forms.CharField(max_length=11)
     password = forms.CharField(widget=forms.PasswordInput)
+
+    def clean_phone(self):
+        phone_number = self.cleaned_data['phone']
+        user = User.objects.filter(phone_number=phone_number).exists()
+        if user:
+            raise ValidationError('This phone number is already exist')
+        return phone_number
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        user = User.objects.filter(email=email).exists()
+        if user:
+            raise ValidationError('This email is already exist.')
+        return email
 
 
 class VerifyCodeForm(forms.Form):
