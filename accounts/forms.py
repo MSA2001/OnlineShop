@@ -41,6 +41,9 @@ class UserRegistrationForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
+class VerifyCodeForm(forms.Form):
+    code = forms.IntegerField
+
 
 
 
