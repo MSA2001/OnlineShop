@@ -1,10 +1,12 @@
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.views import View
-from .forms import UserRegistrationForm, VerifyCodeForm
+from .forms import UserRegistrationForm, VerifyCodeForm, UserLoginForm
 from django.contrib import messages
 import random
 from utils import send_otp_code
 from.models import OtpCode, User
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
@@ -57,6 +59,33 @@ class UserRegisterVerifyCodeView(View):
                 return redirect('accounts:verify_code')
         return redirect('home:home')
 
-        pass
 
+class UserLoginView(View):
+    form_class = UserLoginForm
+
+    def get(self, request):
+        form = self.form_class
+        return render(request, 'accounts/login.html', {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(request, phone_number=cd['phone'], password=cd['password'])
+            if user is not None:
+                login(request, user)
+                messages.success(request, 'you logged in successfully', 'success')
+                return redirect('home:home')
+            else:
+                messages.error(request, 'invalid username/password')
+                return redirect('accounts:user_login')
+            return render(request, 'accounts/login.html', {'form': form})
+
+
+class UserLogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        messages.success(request, 'You logged out successfully', 'success')
+        return redirect('home:home')
 
