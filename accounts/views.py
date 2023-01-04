@@ -82,7 +82,7 @@ class UserLoginView(View):
             return render(request, 'accounts/login.html', {'form': form})
 
 
-class UserLogoutView(View):
+class UserLogoutView(View, LoginRequiredMixin):
 
     def get(self, request):
         logout(request)
