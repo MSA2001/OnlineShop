@@ -2,8 +2,20 @@
 {% load static %}
 {% block extra_headers %}
     <link rel="stylesheet" href="{% static 'home/css/style.css' %}">
- {% endblock %}
+{% endblock %}
 
 {% block content %}
-<h3> homepage</h3>
+    <h3> homepage</h3>
+    {% for product in products %}
+        <div class="card" style="width: 18rem;">
+            <img src="{{ product.image.url }}" class="card-img-top" >
+            <div class="card-body">
+                <h5 class="card-title"><a href="{{ product.get_absolute_url }}"> {{ product.name }}</a></h5>
+
+
+            </div>
+        </div>
+
+    {% endfor %}
+
 {% endblock %}
