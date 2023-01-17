@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from .models import Product, Category
 from django.shortcuts import get_object_or_404
+from utils import IsAdminUserMixin
 # Create your views here.
 
 
