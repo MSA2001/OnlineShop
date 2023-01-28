@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block content %}
-    <h3> homepage</h3>
+    {% for category in categories %}
+    <a href="{{ category.get_absolute_url }}" class="btn btn-info">{{ category.name }}</a>
+    {% endfor %}
+    <br> <br>
     {% for product in products %}
-        <div class="card" style="width: 18rem;">
-            <img src="{{ product.image.url }}" class="card-img-top" >
+        <div class="card" style="width: 18rem; display: inline-block;">
+            <img src="{{ product.image.url }}" class="card-img-top" width="450px" height="200px" >
             <div class="card-body">
                 <h5 class="card-title"><a href="{{ product.get_absolute_url }}"> {{ product.name }}</a></h5>
 

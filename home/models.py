@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 
 # Create your models here.
+from django.utils.text import slugify
 
 
 class Category(models.Model):
@@ -11,6 +12,9 @@ class Category(models.Model):
     class Meta:
         ordering = ('name',)
         verbose_name_plural = 'Categories'
+
+    def get_absolute_url(self):
+        return reverse('home:category_filter', args=[self.slug])
 
     def __str__(self):
         return self.name
@@ -35,5 +39,9 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('home:product_detail', args=[self.slug])
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.slug = slugify(self.name)
+        super(Product, self).save()
 
 
