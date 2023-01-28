@@ -6,8 +6,9 @@ from .models import Category, Product
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'available')
+    list_display = ('name', 'price', 'available')
     prepopulated_fields = {'slug': ('name',)}
+    raw_id_fields = ('category',)
 
 
 admin.site.register(Category)
