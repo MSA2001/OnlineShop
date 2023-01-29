@@ -10,7 +10,12 @@
     <br>
     <p>{{ product.price }}$</p>
 <img src="{{ product.image.url }}" height="250px" width="400px">
-    <p>{{ product.description }}</p>
+    <p>{{ product.description }}</p> <br> <br>
+    <form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Add to cart">
+    </form>
 
 
 {% endblock %}

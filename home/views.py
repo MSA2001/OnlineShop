@@ -3,6 +3,7 @@ from django.views import View
 from .models import Product, Category
 from django.shortcuts import get_object_or_404
 from utils import IsAdminUserMixin
+from orders.forms import CartAddForm
 # Create your views here.
 
 
@@ -21,5 +22,6 @@ class ProductDetailView(View):
 
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
-        return render(request, 'home/detail.html', {'product': product})
+        form = CartAddForm()
+        return render(request, 'home/detail.html', {'product': product, 'form': form})
 
