@@ -56,6 +56,8 @@ class OrderCreateView(LoginRequiredMixin, View):
         for item in cart:
             OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
                                      quantity=item['quantity'])
+
+        cart.clear()
         return redirect('orders:order_detail', order.id)
 
 
@@ -71,12 +73,15 @@ CallbackURL = 'http://localhost:8000/orders/verify/'
 class OrderPayView(LoginRequiredMixin, View):
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id)
+        request.session['order_pay'] = {
+            'order_id': order.id,
+        }
         req_data = {
             "merchant_id": MERCHANT,
             "amount": order.get_total_price(),
             "callback_url": CallbackURL,
             "description": description,
-            "metadata": {"mobile": request.user.phone_number}
+            "metadata": {"mobile": request.user.phone_number, "email": request.user.email}
         }
         req_header = {"accept": "application/json",
                       "content-type": "application/json'"}
@@ -89,3 +94,4 @@ class OrderPayView(LoginRequiredMixin, View):
             e_code = req.json()['errors']['code']
             e_message = req.json()['errors']['message']
             return HttpResponse(f"Error code: {e_code}, Error Message: {e_message}")
+
