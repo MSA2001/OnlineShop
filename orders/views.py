@@ -2,12 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from .cart import Cart
 from home.models import Product
-from .forms import CartAddForm
+from .forms import CartAddForm, CouponApplyForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Order, OrderItem
+from .models import Order, OrderItem, Coupon
 from django.http import HttpResponse
+from django.contrib import messages
 import requests
 import json
+import datetime
 
 
 # Create your views here.
@@ -22,9 +24,6 @@ class CartView(View):
 
 
 class CartAddView(View):
-
-    def get(self, request):
-        pass
 
     def post(self, request, product_id):
         cart = Cart(request)
@@ -44,9 +43,12 @@ class CartRemoveView(View):
 
 
 class OrderDetailView(LoginRequiredMixin, View):
+    form_class = CouponApplyForm
+
     def get(self, request, order_id):
         order = get_object_or_404(Order, id=order_id)
-        return render(request, 'orders/order.html', {'order': order})
+
+        return render(request, 'orders/order.html', {'order': order, 'form': self.form_class})
 
 
 class OrderCreateView(LoginRequiredMixin, View):
@@ -61,7 +63,7 @@ class OrderCreateView(LoginRequiredMixin, View):
         return redirect('orders:order_detail', order.id)
 
 
-# zarin pal https://github.com/rasooll/zarinpal-django-py3/blob/master/views.py
+# zarin pal https://github.com/rasooll/zarinpal-django-py3/
 MERCHANT = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
 ZP_API_REQUEST = "https://api.zarinpal.com/pg/v4/payment/request.json"
 ZP_API_VERIFY = "https://api.zarinpal.com/pg/v4/payment/verify.json"
@@ -133,3 +135,22 @@ class OrderVerifyView(LoginRequiredMixin, View):
                 return HttpResponse(f"Error code: {e_code}, Error Message: {e_message}")
         else:
             return HttpResponse('Transaction failed or canceled by user')
+
+
+class CouponApplyView(LoginRequiredMixin, View):
+    form_class = CouponApplyForm
+
+    def post(self, request, order_id):
+        now = datetime.datetime.now()
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            code = form.cleaned_data['code']
+            try:        # checking discount coupon code...
+                coupon = Coupon.objects.get(code__exact=code, valid_from__lte=now, valid_to__gte=now, active=True)
+            except Coupon.DoesNotExist:
+                messages.error(request, 'This coupon does not exist', 'danger')
+                return redirect('orders:order_detail', order_id)
+            order = Order.objects.get(id=order_id)
+            order.discount = coupon.discount
+            order.save()
+        return redirect('orders:order_detail', order_id)
