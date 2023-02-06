@@ -152,5 +152,8 @@ class CouponApplyView(LoginRequiredMixin, View):
                 return redirect('orders:order_detail', order_id)
             order = Order.objects.get(id=order_id)
             order.discount = coupon.discount
+            if coupon.active is True:
+                coupon.active = False
+                coupon.save()
             order.save()
         return redirect('orders:order_detail', order_id)
