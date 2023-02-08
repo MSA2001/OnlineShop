@@ -23,7 +23,7 @@ class CartView(View):
         return render(request, 'orders/cart.html', {'cart': cart})
 
 
-class CartAddView(PermissionRequiredMixin, View):
+class CartAddView(View):
 
     def post(self, request, product_id):
         cart = Cart(request)
