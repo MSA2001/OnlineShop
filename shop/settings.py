@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'orders.apps.OrdersConfig',
     'storages',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +154,10 @@ AWS_S3_ENDPOINT_URL = 'https://s3.ir-thr-at1.arvanstorage.com'
 AWS_STORAGE_BUCKET_NAME = 'django-shop2001'
 AWS_SERVICE_NAME = 's3'
 AWS_S3_FILE_OVERWRITE = False
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+    },
+}
